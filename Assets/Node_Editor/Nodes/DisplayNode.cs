@@ -26,20 +26,20 @@ public class DisplayNode : Node
 		GUILayout.BeginHorizontal ();
 		GUILayout.Label (new GUIContent ("Value : " + (assigned? value.ToString () : ""), "The input value to display"));
 		if (Event.current.type == EventType.Repaint) 
-			Inputs [0].SetRect (GUILayoutUtility.GetLastRect ());
+			inputs [0].SetRect (GUILayoutUtility.GetLastRect ());
 		GUILayout.EndHorizontal ();
 	}
 	
 	public override bool Calculate () 
 	{
-		if (!allInputsReady ()) 
+		if (!allinputsReady()) 
 		{
 			value = 0;
 			assigned = false;
 			return false;
 		}
 
-		value = (float)Inputs [0].connection.value;
+		value = (float)inputs [0].connection.value;
 		assigned = true;
 
 		return true;

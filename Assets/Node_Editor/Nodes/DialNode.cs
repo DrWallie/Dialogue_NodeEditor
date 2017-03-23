@@ -1,13 +1,11 @@
 ﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
 
 [System.Serializable]
 public class DialNode : Node
 {
 	//public enum CalcType { Add, Substract, Multiply, Divide }
 	//public CalcType type = CalcType.Add;
-    public int OutputCount = 1;
+    public int outputCount = 1;
     //public static GUIStyle plusButton;
 
     public static DialNode Create (Rect NodeRect)
@@ -15,7 +13,7 @@ public class DialNode : Node
 		DialNode node = ScriptableObject.CreateInstance <DialNode> ();
 		node.name = "Dialogue Node";
 		node.rect = NodeRect;
-		
+
 		NodeInput.Create (node, "Input 1", typeof (string));
         NodeOutput.Create (node, "Output 1", typeof (string));
 
@@ -27,14 +25,11 @@ public class DialNode : Node
 	{
 		GUILayout.BeginHorizontal ();
 		GUILayout.BeginVertical ();
-
-        //plusButton = new GUIStyle(GUI.skin.button);
-        //plusButton.normal.textColor = new Color(0.3f, 0.3f, 0.3f);
         
         #region Deprecated
-        /*if (Inputs[0].connection != null)
+        /*if (inputs[0].connection != null)
         {
-            GUILayout.Label(Inputs[0].name);
+            GUILayout.Label(inputs[0].name);
         }*/
 
         /*else
@@ -44,11 +39,11 @@ public class DialNode : Node
 
         /*if (Event.current.type == EventType.Repaint)
         {
-            Inputs[0].SetRect(GUILayoutUtility.GetLastRect());
+            inputs[0].SetRect(GUILayoutUtility.GetLastRect());
         }*/
-        /*if (Inputs[1].connection != null)
+        /*if (inputs[1].connection != null)
         {
-            GUILayout.Label(Inputs[1].name);
+            GUILayout.Label(inputs[1].name);
         }*/
         /*else
         {
@@ -57,7 +52,7 @@ public class DialNode : Node
 
         /*if (Event.current.type == EventType.Repaint)
         {
-            Inputs[1].SetRect(GUILayoutUtility.GetLastRect());
+            inputs[1].SetRect(GUILayoutUtility.GetLastRect());
         }*/
 
         /*if (GUILayout.Button(new GUIContent("+", "Adds extra options"), plusButton))
@@ -69,8 +64,12 @@ public class DialNode : Node
         GUILayout.EndVertical ();
 		GUILayout.BeginVertical ();
 
-        Inputs[0].DisplayLayout();
-        Outputs[0].DisplayLayout ();
+        inputs[0].DisplayLayout ();
+        for(int i = 0; i <= outputCount - 1; i++)
+        {
+            outputs[i].DisplayLayout();
+        }
+        //outputs[0].DisplayLayout ();
 		//We take that this time, because it has a GuiStyle to aligned to the right
 
 		GUILayout.EndVertical ();
@@ -79,13 +78,19 @@ public class DialNode : Node
         //GUILayout.Button(new GUIContent("+", "Adds extra options"), plusButton);
         if (GUI.Button(new Rect(175, 0, 25, 25), "+")) //Dial Node is standaard 200 bij 100
         {
-            OutputCount += 1;
-            Debug.Log(OutputCount);
+            outputCount += 1;
+            outputs[outputCount-1].DisplayLayout();
+            DialNode node = ScriptableObject.CreateInstance<DialNode>();
+            NodeOutput.Create(node, "Output 1", typeof(string));
+            Debug.Log(outputCount);
         }
+
         if (GUI.Button(new Rect(150, 0, 25, 25), "-"))
         {
-            OutputCount -= 1;
-            Debug.Log(OutputCount);
+            outputCount -= 1;
+            DialNode node = ScriptableObject.CreateInstance<DialNode>();
+            NodeOutput.Create(node, "Output 1", typeof(string));
+            Debug.Log(outputCount);
         }
         //type = (CalcType)EditorGUILayout.EnumPopup (new GUIContent ("Calculation Type", "The type of calculation performed on Input 1 and Input 2"), type);
 

@@ -7,8 +7,8 @@ public abstract class Node : ScriptableObject
 {
 	public Rect rect = new Rect ();
 
-	public List<NodeInput> Inputs = new List<NodeInput> ();
-	public List<NodeOutput> Outputs = new List<NodeOutput> ();
+	public List<NodeInput> inputs = new List<NodeInput> ();
+	public List<NodeOutput> outputs = new List<NodeOutput> ();
 
 	/// <summary>
 	/// Init this node. Has to be called when creating a child node of this
@@ -20,19 +20,20 @@ public abstract class Node : ScriptableObject
 		if (!String.IsNullOrEmpty (AssetDatabase.GetAssetPath (Node_Editor.editor.nodeCanvas)))
 		{
 			AssetDatabase.AddObjectToAsset (this, Node_Editor.editor.nodeCanvas);
-            for (int inCnt = 0; inCnt < Inputs.Count; inCnt++)
+            for (int inCnt = 0; inCnt < inputs.Count; inCnt++)
             {
-                AssetDatabase.AddObjectToAsset(Inputs[inCnt], this);
+                AssetDatabase.AddObjectToAsset(inputs[inCnt], this);
             }
 
-            for (int outCnt = 0; outCnt < Outputs.Count; outCnt++)
+            for (int outCnt = 0; outCnt < outputs.Count; outCnt++)
             {
-                AssetDatabase.AddObjectToAsset(Outputs[outCnt], this);
+                AssetDatabase.AddObjectToAsset(outputs[outCnt], this);
             }
-
 			AssetDatabase.ImportAsset (Node_Editor.editor.openedCanvasPath);
 			AssetDatabase.Refresh ();
+
 		}
+
 	}
 
 	/// <summary>
@@ -51,9 +52,9 @@ public abstract class Node : ScriptableObject
 	/// </summary>
 	public void DrawConnectors () 
 	{
-		for (int outCnt = 0; outCnt < Outputs.Count; outCnt++) 
+		for (int outCnt = 0; outCnt < outputs.Count; outCnt++) 
 		{
-			NodeOutput output = Outputs [outCnt];
+			NodeOutput output = outputs [outCnt];
 			for (int conCnt = 0; conCnt < output.connections.Count; conCnt++) 
 			{
                 if (output.connections[conCnt] != null)
@@ -68,10 +69,12 @@ public abstract class Node : ScriptableObject
 			}
 			GUI.DrawTexture (output.GetKnob (), Node_Editor.ConnectorKnob);
 		}
-		for (int inCnt = 0; inCnt < Inputs.Count; inCnt++) 
+		for (int inCnt = 0; inCnt < inputs.Count; inCnt++) 
 		{
-			GUI.DrawTexture (Inputs [inCnt].GetKnob (), Node_Editor.ConnectorKnob);
-		}
+            //GUI.DrawTexture (inputs [inCnt].GetKnob (), Node_Editor.ConnectorKnob);
+            GUI.DrawTextureWithTexCoords(inputs[inCnt].GetKnob(), Node_Editor.ConnectorKnob, new Rect(1, 0, -1, 1));
+
+        }
 	}
 
 	/// <summary>
@@ -79,20 +82,22 @@ public abstract class Node : ScriptableObject
 	/// </summary>
 	public virtual void OnDelete () 
 	{
-		for (int outCnt = 0; outCnt < Outputs.Count; outCnt++) 
+		for (int outCnt = 0; outCnt < outputs.Count; outCnt++) 
 		{
-			NodeOutput output = Outputs [outCnt];
+			NodeOutput output = outputs [outCnt];
             for (int conCnt = 0; conCnt < output.connections.Count; conCnt++)
             {
                 output.connections[outCnt].connection = null;
             }
+
 		}
-		for (int inCnt = 0; inCnt < Inputs.Count; inCnt++) 
+		for (int inCnt = 0; inCnt < inputs.Count; inCnt++) 
 		{
-            if (Inputs[inCnt].connection != null)
+            if (inputs[inCnt].connection != null)
             {
-                Inputs[inCnt].connection.connections.Remove(Inputs[inCnt]);
+                inputs[inCnt].connection.connections.Remove(inputs[inCnt]);
             }
+
 		}
 
 		DestroyImmediate (this, true);
@@ -101,6 +106,7 @@ public abstract class Node : ScriptableObject
 			AssetDatabase.ImportAsset (Node_Editor.editor.openedCanvasPath);
 			AssetDatabase.Refresh ();
 		}
+
 	}
 
 	#region Member Functions
@@ -108,14 +114,15 @@ public abstract class Node : ScriptableObject
 	/// <summary>
 	/// Checks if there are no unassigned and no null-value inputs.
 	/// </summary>
-	public bool allInputsReady () 
+	public bool allinputsReady () 
 	{
-		for (int inCnt = 0; inCnt < Inputs.Count; inCnt++) 
+		for (int inCnt = 0; inCnt < inputs.Count; inCnt++) 
 		{
-            if (Inputs[inCnt].connection == null || Inputs[inCnt].connection.value == null)
+            if (inputs[inCnt].connection == null || inputs[inCnt].connection.value == null)
             {
                 return false;
             }
+
 		}
 		return true;
 	}
@@ -123,44 +130,57 @@ public abstract class Node : ScriptableObject
 	/// <summary>
 	/// Checks if there are any unassigned inputs.
 	/// </summary>
-	public bool hasNullInputs () 
+	public bool hasNullinputs () 
 	{
-		for (int inCnt = 0; inCnt < Inputs.Count; inCnt++) 
+		for (int inCnt = 0; inCnt < inputs.Count; inCnt++) 
 		{
-            if (Inputs[inCnt].connection == null)
+            if (inputs[inCnt].connection == null)
             {
                 return true;
             }
+
 		}
 		return false;
 	}
 
-	/// <summary>
-	/// Checks if there are any null-value inputs.
-	/// </summary>
 	public bool hasNullInputValues () 
 	{
-		for (int inCnt = 0; inCnt < Inputs.Count; inCnt++) 
+		for (int inCnt = 0; inCnt < inputs.Count; inCnt++) 
 		{
-            if (Inputs[inCnt].connection != null && Inputs[inCnt].connection.value == null)
+            if (inputs[inCnt].connection != null && inputs[inCnt].connection.value == null)
             {
                 return true;
             }
+
 		}
 		return false;
 	}
 
-	/// <summary>
-	/// Returns the input knob that is at the position on this node or null
-	/// </summary>
-	public NodeInput GetInputAtPos (Vector2 pos) 
-	{
-		for (int inCnt = 0; inCnt < Inputs.Count; inCnt++) 
-		{ // Search for an input at the position
-            if (Inputs[inCnt].GetKnob().Contains(new Vector3(pos.x, pos.y)))
+    /*public bool hasNullOutputValues()
+    {
+        for (int outCnt = 0; outCnt < inputs.Count; outCnt++)
+        {
+            if (outputs[outCnt].connections != null && outputs[outCnt].connection.value == null)
             {
-                return Inputs[inCnt];
+                return true;
             }
+
+        }
+        return false;
+    }*/
+
+    /// <summary>
+    /// Returns the input knob that is at the position on this node or null
+    /// </summary>
+    public NodeInput GetInputAtPos (Vector2 pos) 
+	{
+		for (int inCnt = 0; inCnt < inputs.Count; inCnt++) 
+		{ // Search for an input at the position
+            if (inputs[inCnt].GetKnob().Contains(new Vector3(pos.x, pos.y)))
+            {
+                return inputs[inCnt];
+            }
+
 		}
 		return null;
 	}
@@ -170,12 +190,13 @@ public abstract class Node : ScriptableObject
 	/// </summary>
 	public NodeOutput GetOutputAtPos (Vector2 pos) 
 	{
-		for (int outCnt = 0; outCnt < Outputs.Count; outCnt++) 
+		for (int outCnt = 0; outCnt < outputs.Count; outCnt++) 
 		{ // Search for an output at the position
-            if (Outputs[outCnt].GetKnob().Contains(new Vector3(pos.x, pos.y)))
+            if (outputs[outCnt].GetKnob().Contains(new Vector3(pos.x, pos.y)))
             {
-                return Outputs[outCnt];
+                return outputs[outCnt];
             }
+
 		}
 		return null;
 	}
@@ -185,36 +206,50 @@ public abstract class Node : ScriptableObject
 	/// </summary>
 	public bool isChildOf (Node otherNode)
 	{
-		if (otherNode == null)
-			return false;
-		for (int cnt = 0; cnt < Inputs.Count; cnt++) 
+        if (otherNode == null)
+        {
+            return false;
+        }
+
+		for (int cnt = 0; cnt < inputs.Count; cnt++) 
 		{
-			if (Inputs [cnt].connection != null) 
+			if (inputs [cnt].connection != null) 
 			{
-				if (Inputs [cnt].connection.body == otherNode)
-					return true;
-				else if (Inputs [cnt].connection.body.isChildOf (otherNode)) // Recursively searching
-					return true;
+                if (inputs[cnt].connection.body == otherNode)
+                {
+                    return true;
+                }
+                else if (inputs[cnt].connection.body.isChildOf(otherNode)) // Recursively searching
+                {
+                    return true;
+                }
+
 			}
 		}
 		return false;
 	}
-	#endregion
+    #endregion
 
-	#region static Functions
-	/// <summary>
-	/// Check if an output and an input can be connected (same type, ...)
-	/// </summary>
-	public static bool CanApplyConnection (NodeOutput output, NodeInput input)
-	{
-		if (input == null || output == null)
-			return false;
+    #region static Functions
+    /// <summary>
+    /// Check if an output and an input can be connected (same type, ...)
+    /// </summary>
+    public static bool CanApplyConnection(NodeOutput output, NodeInput input)
+    {
+        if (input == null || output == null)
+        {
+            return false;
+        }
 
-		if (input.body == output.body || input.connection == output)
-			return false;
+        if (input.body == output.body || input.connection == output)
+        {
+            return false;
+        }
 
-		if (input.type != output.type)
-			return false;
+        if (input.type != output.type)
+        {
+            return false;
+        }
 
 		if (output.body.isChildOf (input.body)) 
 		{

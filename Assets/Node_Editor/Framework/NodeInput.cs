@@ -17,7 +17,7 @@ public class NodeInput : ScriptableObject
 		input.body = NodeBody;
 		input.type = InputType.AssemblyQualifiedName;
 		input.name = InputName;
-		NodeBody.Inputs.Add (input);
+		NodeBody.inputs.Add (input);
 		return input;
 	}
 

@@ -20,7 +20,7 @@ public class NodeOutput : ScriptableObject
 		output.body = NodeBody;
 		output.type = OutputType.AssemblyQualifiedName;
 		output.name = OutputName;
-		NodeBody.Outputs.Add (output);
+		NodeBody.outputs.Add (output);
 		return output;
 	}
 

@@ -32,24 +32,24 @@ public class CalcNode : Node
 		GUILayout.BeginHorizontal ();
 		GUILayout.BeginVertical ();
 
-		if (Inputs [0].connection != null)
-			GUILayout.Label (Inputs [0].name);
+		if (inputs [0].connection != null)
+			GUILayout.Label (inputs [0].name);
 		else
 			Input1Val = EditorGUILayout.FloatField (Input1Val);
 		if (Event.current.type == EventType.Repaint) 
-			Inputs [0].SetRect (GUILayoutUtility.GetLastRect ());
+			inputs [0].SetRect (GUILayoutUtility.GetLastRect ());
 		// --
-		if (Inputs [1].connection != null)
-			GUILayout.Label (Inputs [1].name);
+		if (inputs [1].connection != null)
+			GUILayout.Label (inputs [1].name);
 		else
 			Input2Val = EditorGUILayout.FloatField (Input2Val);
 		if (Event.current.type == EventType.Repaint) 
-			Inputs [1].SetRect (GUILayoutUtility.GetLastRect ());
+			inputs [1].SetRect (GUILayoutUtility.GetLastRect ());
 
 		GUILayout.EndVertical ();
 		GUILayout.BeginVertical ();
 
-		Outputs [0].DisplayLayout ();
+		outputs [0].DisplayLayout ();
 		// We take that this time, because it has a GuiStyle to aligned to the right :)
 
 		GUILayout.EndVertical ();
@@ -63,24 +63,24 @@ public class CalcNode : Node
 
 	public override bool Calculate () 
 	{
-		if (Inputs [0].connection != null && Inputs [0].connection.value != null) 
-			Input1Val = (float)Inputs [0].connection.value;
-		if (Inputs [1].connection != null && Inputs [1].connection.value != null) 
-			Input2Val = (float)Inputs [1].connection.value;
+		if (inputs [0].connection != null && inputs [0].connection.value != null) 
+			Input1Val = (float)inputs [0].connection.value;
+		if (inputs [1].connection != null && inputs [1].connection.value != null) 
+			Input2Val = (float)inputs [1].connection.value;
 
 		switch (type) 
 		{
 		case CalcType.Add:
-			Outputs [0].value = Input1Val + Input2Val;
+			outputs [0].value = Input1Val + Input2Val;
 			break;
 		case CalcType.Substract:
-			Outputs [0].value = Input1Val - Input2Val;
+			outputs [0].value = Input1Val - Input2Val;
 			break;
 		case CalcType.Multiply:
-			Outputs [0].value = Input1Val * Input2Val;
+			outputs [0].value = Input1Val * Input2Val;
 			break;
 		case CalcType.Divide:
-			Outputs [0].value = Input1Val / Input2Val;
+			outputs [0].value = Input1Val / Input2Val;
 			break;
 		}
 

@@ -158,7 +158,7 @@ public class Node_Editor : EditorWindow
 		workList = new List<Node> ();
 		for (int nodeCnt = 0; nodeCnt < nodeCanvas.nodes.Count; nodeCnt++) 
 		{
-			if (nodeCanvas.nodes [nodeCnt].Inputs.Count == 0) 
+			if (nodeCanvas.nodes [nodeCnt].inputs.Count == 0) 
 			{
 				workList.Add (nodeCanvas.nodes [nodeCnt]);
 				ClearChildrenInput (nodeCanvas.nodes [nodeCnt]);
@@ -195,11 +195,13 @@ public class Node_Editor : EditorWindow
 				Node node = workList [workCnt];
 				if (node.Calculate ())
 				{ // finished Calculating, continue with the children
-					for (int outCnt = 0; outCnt < node.Outputs.Count; outCnt++)
+					for (int outCnt = 0; outCnt < node.outputs.Count; outCnt++)
 					{
-						NodeOutput output = node.Outputs [outCnt];
-						for (int conCnt = 0; conCnt < output.connections.Count; conCnt++)
-							ContinueCalculation (output.connections [conCnt].body);
+						NodeOutput output = node.outputs [outCnt];
+                        for (int conCnt = 0; conCnt < output.connections.Count; conCnt++)
+                        {
+                            ContinueCalculation(output.connections[conCnt].body);
+                        }
 					}
 					if (workList.Contains (node))
 						workList.Remove (node);
@@ -220,12 +222,14 @@ public class Node_Editor : EditorWindow
 	private void ClearChildrenInput (Node node) 
 	{
 		node.Calculate ();
-		for (int outCnt = 0; outCnt < node.Outputs.Count; outCnt++)
+		for (int outCnt = 0; outCnt < node.outputs.Count; outCnt++)
 		{
-			NodeOutput output = node.Outputs [outCnt];
+			NodeOutput output = node.outputs [outCnt];
 			output.value = null;
-			for (int conCnt = 0; conCnt < output.connections.Count; conCnt++)
-				ClearChildrenInput (output.connections [conCnt].body);
+            for (int conCnt = 0; conCnt < output.connections.Count; conCnt++)
+            {
+                ClearChildrenInput(output.connections[conCnt].body);
+            }
 		}
 	}
 
@@ -237,9 +241,9 @@ public class Node_Editor : EditorWindow
 	{
 		if (node.Calculate ())
 		{ // finished Calculating, continue with the children
-			for (int outCnt = 0; outCnt < node.Outputs.Count; outCnt++)
+			for (int outCnt = 0; outCnt < node.outputs.Count; outCnt++)
 			{
-				NodeOutput output = node.Outputs [outCnt];
+				NodeOutput output = node.outputs [outCnt];
 				for (int conCnt = 0; conCnt < output.connections.Count; conCnt++)
 				{
 					ContinueCalculation (output.connections [conCnt].body);
@@ -354,7 +358,7 @@ public class Node_Editor : EditorWindow
 		{
 			if (connectOutput != null) 
 			{ // Apply a connection if theres a clicked input
-				if (clickedNode != null && !clickedNode.Outputs.Contains (connectOutput)) 
+				if (clickedNode != null && !clickedNode.outputs.Contains (connectOutput)) 
 				{	// If an input was clicked, it'll will now be connected
 					NodeInput clickedInput = clickedNode.GetInputAtPos (mousePos);
 					if (Node.CanApplyConnection (connectOutput, clickedInput)) 
@@ -553,10 +557,10 @@ public class Node_Editor : EditorWindow
 			// Results in a big mess but there's no other way
 			Node node = nodeCanvas.nodes [nodeCnt];
 			AssetDatabase.AddObjectToAsset (node, nodeCanvas);
-			for (int inCnt = 0; inCnt < node.Inputs.Count; inCnt++) 
-				AssetDatabase.AddObjectToAsset (node.Inputs [inCnt], node);
-			for (int outCnt = 0; outCnt < node.Outputs.Count; outCnt++) 
-				AssetDatabase.AddObjectToAsset (node.Outputs [outCnt], node);
+			for (int inCnt = 0; inCnt < node.inputs.Count; inCnt++) 
+				AssetDatabase.AddObjectToAsset (node.inputs [inCnt], node);
+			for (int outCnt = 0; outCnt < node.outputs.Count; outCnt++) 
+				AssetDatabase.AddObjectToAsset (node.outputs [outCnt], node);
 		}
 
 		string[] folders = path.Split (new char[] {'/'}, StringSplitOptions.None);
